@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     {% load static %}
     <meta charset="UTF-8">
@@ -79,7 +79,7 @@ data-authenticated="{{ request.user.is_authenticated|yesno:'true,false' }}"
                         <a class="nav-link" href="{% url 'login' %}">Log in</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register_step1' %}">Sing in</a>
+                        <a class="nav-link" href="{% url 'register_step1' %}">Sign up</a>
                     </li>
                 {% endif %}
             </ul>

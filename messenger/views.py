@@ -19,7 +19,7 @@ class CreateChatView(LoginRequiredMixin, View):
         other_user_id = request.POST.get('user_id')
 
         if not other_user_id:
-            return JsonResponse({'error': 'Не вказано користувача'}, status=400)
+            return JsonResponse({'error': 'User not specified'}, status=400)
 
         other_user = get_object_or_404(User, id=other_user_id)
 
@@ -206,12 +206,12 @@ class SendMessageView(LoginRequiredMixin, View):
         except json.JSONDecodeError:
             return JsonResponse({'errors': 'Invalid JSON'}, status=400)
 
-        form = MessageForm(payload)
         chat_id = kwargs.get('chat_id') or payload.get('chat_id')
         if chat_id is None:
             return JsonResponse({'errors': {'chat_id': ['Required.']}}, status=400)
 
         chat = get_object_or_404(Chat, id=chat_id, users=request.user)
+        form = MessageForm(payload, chat=chat)
 
         if not form.is_valid():
             return JsonResponse({'errors': form.errors}, status=400)

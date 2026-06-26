@@ -31,5 +31,5 @@ def create_follow_notification(sender, instance, created, **kwargs):
             from_user=follower,
             event_type=Notification.EventType.NEW_FOLLOWER,
             target=following,
-            target_url=reverse("user_detail", kwargs={"slug": following.slug})
+            target_url=reverse("user_detail", kwargs={"slug": follower.slug})
         )

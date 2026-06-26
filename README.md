@@ -5,6 +5,7 @@
 > A full-featured social network focused on real-time communication, communities, and meaningful interaction. Share moments. Meet people. Build connections.
 
 <!-- Status badges -->
+![Tests](https://github.com/Rokit8481/social-network/actions/workflows/tests.yml/badge.svg)
 ![Last commit](https://img.shields.io/github/last-commit/Rokit8481/social-network)
 ![Repo size](https://img.shields.io/github/repo-size/Rokit8481/social-network)
 ![Stars](https://img.shields.io/github/stars/Rokit8481/social-network)
@@ -154,20 +155,24 @@ It acts as a central hub for discovery and activity.
 
 ## 📷 Screenshots
 
-The following pages should be showcased with screenshots:
+| Main page | Messenger |
+|-----------|-----------|
+| ![Main page](docs/screenshots/main-page.png) | ![Messenger](docs/screenshots/messenger.png) |
 
-- main page;
-- messenger page;
-- notifications page;
-- board detail page;
-- post detail page;
-- user profile page;
-- boards list page;
-- registration step 1;
-- registration step 2;
-- board edit page (form example).
+| Notifications | Board detail |
+|---------------|--------------|
+| ![Notifications](docs/screenshots/notifications.png) | ![Board detail](docs/screenshots/board-detail.png) |
 
-Screenshots can be placed in `docs/screenshots/` and linked here.
+| Post detail | User profile |
+|-------------|--------------|
+| ![Post detail](docs/screenshots/post-detail.png) | ![User profile](docs/screenshots/user-profile.png) |
+
+| Boards list | Registration |
+|-------------|----------------|
+| ![Boards list](docs/screenshots/boards-list.png) | ![Registration](docs/screenshots/register-step1.png) |
+
+> Screenshots are stored in [`docs/screenshots/`](docs/screenshots/).  
+> Live demo: [social-network-kddy.onrender.com](https://social-network-kddy.onrender.com/)
 
 ---
 
@@ -202,42 +207,66 @@ To run the project locally:
 
 1. Clone the repository
 
-```
+```bash
 git clone https://github.com/Rokit8481/social-network
+cd social-network
 ```
 
-2. Create a virtual environment
+2. Create and activate a virtual environment
 
-```
+```bash
 python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS / Linux
+source venv/bin/activate
 ```
 
-3. Reset migrations and database, then apply migrations
+3. Install dependencies
 
-```
-Get-ChildItem -Recurse -Include *.py -Exclude __init__.py -Path *\migrations | Remove-Item -Force
-Get-ChildItem -Recurse -Include *.pyc -Path *\migrations | Remove-Item -Force
-Remove-Item db.sqlite3 -ErrorAction SilentlyContinue
-python manage.py makemigrations
-python manage.py migrate
-```
-
-4. Install dependencies
-
-```
+```bash
 pip install -r requirements.txt
 ```
 
-5. Collect static files
+4. Configure environment variables
 
-```
-python manage.py collectstatic
+```bash
+cp .env.example .env
+# Edit .env and set DJANGO_SECRET_KEY
 ```
 
-6. Run the ASGI server
+5. Apply migrations
 
+```bash
+python manage.py migrate
 ```
-uvicorn social_network.asgi:application
+
+6. (Optional) Create a superuser
+
+```bash
+python manage.py createsuperuser
+```
+
+7. Collect static files
+
+```bash
+python manage.py collectstatic --noinput
+```
+
+8. Run the development server
+
+```bash
+# HTTP + WebSockets (recommended)
+uvicorn social_network.asgi:application --reload
+
+# Or Django runserver (HTTP only)
+python manage.py runserver
+```
+
+9. Run tests
+
+```bash
+python manage.py test
 ```
 
 ---
