@@ -5,19 +5,19 @@
 > A full-featured social network focused on real-time communication, communities, and meaningful interaction. Share moments. Meet people. Build connections.
 
 <!-- Status badges -->
-![Tests](https://github.com/Rokit8481/social-network/actions/workflows/tests.yml/badge.svg)
-![Last commit](https://img.shields.io/github/last-commit/Rokit8481/social-network)
-![Repo size](https://img.shields.io/github/repo-size/Rokit8481/social-network)
-![Stars](https://img.shields.io/github/stars/Rokit8481/social-network)
-![Forks](https://img.shields.io/github/forks/Rokit8481/social-network)
+![Tests](https://github.com/Akrix0/social-network/actions/workflows/tests.yml/badge.svg)
+![Last commit](https://img.shields.io/github/last-commit/Akrix0/social-network)
+![Repo size](https://img.shields.io/github/repo-size/Akrix0/social-network)
+![Stars](https://img.shields.io/github/stars/Akrix0/social-network)
+![Forks](https://img.shields.io/github/forks/Akrix0/social-network)
 
 <!-- Languages -->
-![Top language](https://img.shields.io/github/languages/top/Rokit8481/social-network)
-![Languages count](https://img.shields.io/github/languages/count/Rokit8481/social-network)
+![Top language](https://img.shields.io/github/languages/top/Akrix0/social-network)
+![Languages count](https://img.shields.io/github/languages/count/Akrix0/social-network)
 
 <!-- Repo health -->
-![Open issues](https://img.shields.io/github/issues/Rokit8481/social-network)
-![Contributors](https://img.shields.io/github/contributors/Rokit8481/social-network)
+![Open issues](https://img.shields.io/github/issues/Akrix0/social-network)
+![Contributors](https://img.shields.io/github/contributors/Akrix0/social-network)
 
 ## 📌 Description
 
@@ -208,7 +208,7 @@ To run the project locally:
 1. Clone the repository
 
 ```bash
-git clone https://github.com/Rokit8481/social-network
+git clone https://github.com/Akrix0/social-network
 cd social-network
 ```
 
