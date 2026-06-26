@@ -172,7 +172,7 @@ It acts as a central hub for discovery and activity.
 | ![Boards list](docs/screenshots/boards-list.png) | ![Registration](docs/screenshots/register-step1.png) |
 
 > Screenshots are stored in [`docs/screenshots/`](docs/screenshots/).  
-> Live demo: [social-network-kddy.onrender.com](https://social-network-kddy.onrender.com/)
+> Live demo: [social-network-kddy.onrender.com](https://social-network-kddy.onrender.com/)—out of work
 
 ---
 
@@ -271,12 +271,6 @@ python manage.py test
 
 ---
 
-## 🚀 Project Status
-
-The project is actively maintained. The core functionality is complete, but bugs may still appear and are gradually being fixed.
-
----
-
 ## 🛣️ Future Plans
 
 - improve performance and code optimization;
@@ -298,14 +292,14 @@ original copyright notice is included.
 
 ## 🙌 Credits
 
-This project was fully designed and developed by **Rokit8481** as a personal portfolio and learning project.
+This project was fully designed and developed by **Akrix0** as a personal portfolio and learning project.
 
-- Concept, backend, frontend, and UI logic: [**Rokit8481**](https://github.com/Rokit8481)
+- Concept, backend, frontend, and UI logic: [**Akrix0**](https://github.com/Akrix0)
 - Frameworks and libraries are credited to their respective authors
 
 ---
 
-## 🌍 Deployment
+## 🌍 Deployment (Not available)
 
 SN PulSe is **already deployed and publicly available**.
 
