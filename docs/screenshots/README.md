@@ -1,9 +1,5 @@
 # Screenshots
 
-Place PNG screenshots of the live application in this folder.
-
-Recommended captures from [the live demo](https://social-network-kddy.onrender.com/):
-
 | File | Page |
 |------|------|
 | `main-page.png` | Home feed after login |
