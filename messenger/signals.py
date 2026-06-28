@@ -1,11 +1,26 @@
+from django.core.exceptions import ValidationError
 from django.dispatch import receiver
-from django.db.models.signals import post_save
-from messenger.models import Message, Reaction
+from django.db.models.signals import m2m_changed, post_save
+from messenger.models import Chat, Message, Reaction
 from django.contrib.auth import get_user_model
 from notifications.models import Notification
 from notifications.signals import notify_user
+from django.urls import reverse
 
 User = get_user_model()
+
+
+@receiver(m2m_changed, sender=Chat.users.through)
+def enforce_private_chat_user_limit(sender, instance, action, reverse, pk_set, **kwargs):
+    if reverse or action != "pre_add":
+        return
+    chat = instance
+    if chat.is_group:
+        return
+    extra = len(pk_set or ())
+    if chat.users.count() + extra > 2:
+        raise ValidationError("A private chat cannot have more than two users.")
+
 
 @receiver(post_save, sender=Message)
 def new_messanger_message_notifications(sender, instance, created, **kwargs):
@@ -31,7 +46,8 @@ def new_messanger_message_notifications(sender, instance, created, **kwargs):
                 to_user=user,
                 from_user=message_user,
                 event_type=Notification.EventType.NEW_MESSENGER_MESSAGE,
-                target=message
+                target=message,
+                target_url=reverse("chat", kwargs={"chat_pk": chat.pk}) + f"#message-{message.id}"
             )
 
 @receiver(post_save, sender=Reaction)
@@ -60,5 +76,6 @@ def new_message_notification_notifications(sender, instance, created, **kwargs):
             to_user=message_user,
             from_user=reaction_user,
             event_type=Notification.EventType.MESSAGE_REACTION,
-            target=reaction
+            target=reaction,
+            target_url=reverse("chat", kwargs={"chat_pk": message.chat.pk}) + f"#message-{message.id}"
         )

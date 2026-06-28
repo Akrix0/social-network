@@ -11,9 +11,17 @@ class UsersListViewTest(TestCase):
         response = self.client.get(reverse("users_list"))
         self.assertEqual(response.status_code, 302)
 
-    def test_logged_in_access(self):
+    def test_regular_user_gets_forbidden(self):
         user = User.objects.create_user("u", password="123")
         self.client.login(username="u", password="123")
+
+        response = self.client.get(reverse("users_list"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_staff_user_can_access(self):
+        staff = User.objects.create_user("staff", password="123", is_staff=True)
+        User.objects.create_user("other", password="123")
+        self.client.login(username="staff", password="123")
 
         response = self.client.get(reverse("users_list"))
         self.assertEqual(response.status_code, 200)
@@ -31,18 +39,19 @@ class UserDetailViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("is_following", response.context)
+        self.assertIn("user_is_following", response.context)
 
 class EditUserViewTest(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user("roman", password="123")
+        self.user = User.objects.create_user("roman", password="123", email="r@r.com")
         self.client.login(username="roman", password="123")
 
     def test_edit_profile(self):
         response = self.client.post(
             reverse("edit_user", args=[self.user.slug]),
             {
+                "username": "roman",
                 "first_name": "Roman",
                 "last_name": "Dev",
                 "email": "r@r.com",

@@ -1,13 +1,14 @@
-from django.views.generic import View, ListView, FormView
+from django.views.generic import View, FormView, ListView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.contrib.auth import logout, login
+from accounts.helpers.profile_stats import profile_stats_for_display
 from accounts.models import Follow
-from posts.models import Post, PostLike, Comment, CommentLike
-from messenger.models import Chat, Message, Reaction
-from boards.models import Board, BoardMessage
+from posts.models import Post, PostLike
+from boards.models import Board
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from accounts.forms import RegistrationStep1Form, RegistrationStep2Form, CustomAuthenticationForm, UserEditForm
@@ -16,15 +17,24 @@ from django.contrib.messages import get_messages
 
 User = get_user_model()
 
+class StaffRequiredMixin(LoginRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+        if not request.user.is_staff:
+            raise PermissionDenied
+        return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
+
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
     redirect_authenticated_user = True
     form_class = CustomAuthenticationForm 
 
 class CustomLogoutView(View):
+    http_method_names = ['post', 'options', 'head']
     next_page = reverse_lazy('login')
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         logout(request)
         return redirect(self.next_page)
 
@@ -34,7 +44,12 @@ class RegisterStep1View(FormView):
     success_url = reverse_lazy('register_step2')
 
     def form_valid(self, form):
-        self.request.session['registration_data'] = form.cleaned_data
+        user = User.objects.create_user(
+            username=form.cleaned_data['username'],
+            email=form.cleaned_data['email'],
+            password=form.cleaned_data['password1'],
+        )
+        self.request.session['registration_user_id'] = user.pk
         return super().form_valid(form)
 
 
@@ -44,43 +59,38 @@ class RegisterStep2View(FormView):
     success_url = reverse_lazy('login')
 
     def dispatch(self, request, *args, **kwargs):
-        if 'registration_data' not in request.session:
+        if 'registration_user_id' not in request.session:
             return redirect('register_step1')
         return super().dispatch(request, *args, **kwargs)
 
+    def get_user_from_session(self):
+        return get_object_or_404(User, pk=self.request.session['registration_user_id'])
+
     def form_valid(self, form):
         action = self.request.POST.get('action')
-        data = self.request.session.get('registration_data')
+        user = self.get_user_from_session()
 
         if action == 'later':
-            user = User.objects.create_user(
-                username=data['username'],
-                email=data['email'],
-                password=data['password1']
-            )
-
-            self.request.session.pop('registration_data', None)
+            self.request.session.pop('registration_user_id', None)
             login(self.request, user)
 
-            messages.info(self.request, "Your account has been created. You can complete your profile later.")
-            return redirect('user_detail', slug=user.slug) 
+            messages.info(
+                self.request,
+                "Your account has been created. You can complete your profile later.",
+            )
+            return redirect('user_detail', slug=user.slug)
 
-        user = User.objects.create_user(
-            username=data['username'],
-            email=data['email'],
-            password=data['password1']
-        )
-        user.first_name = form.cleaned_data.get('first_name')
-        user.last_name = form.cleaned_data.get('last_name')
+        user.first_name = form.cleaned_data.get('first_name') or ''
+        user.last_name = form.cleaned_data.get('last_name') or ''
         user.bio = form.cleaned_data.get('bio')
         user.avatar = form.cleaned_data.get('avatar')
         user.mobile = form.cleaned_data.get('mobile')
         user.birthday = form.cleaned_data.get('birthday')
         user.save()
 
-        self.request.session.pop('registration_data', None)
+        self.request.session.pop('registration_user_id', None)
         login(self.request, user)
-        return super().form_valid(form)
+        return redirect('user_detail', slug=user.slug)
 
 class EditUserView(LoginRequiredMixin, View):
     template_name = 'accounts/edit_user.html'
@@ -202,46 +212,7 @@ class UserDetailView(LoginRequiredMixin, View):
 
         
 
-        boards_count = Board.objects.filter(creator=user_detail).count() # How much boards current user have
-        board_messages_count = BoardMessage.objects.filter(sender=user_detail).count() # How much board messages current user posted
-        posts_count = Post.objects.filter(author=user_detail).count() # How much posts current user posted
-        tagged_in_posts_count = Post.objects.filter(people_tags=user_detail).count() # In how much posts current user is tagged in
-        posts_likes_given_count = PostLike.objects.filter(user=user_detail).count() # How much posts likes current user gave
-        my_posts_likes_count = PostLike.objects.filter(post__author=user_detail).count() # How much posts likes current user revieved on his posts
-        comments_given_count = Comment.objects.filter(user=user_detail).count() # How much comments current user sented
-        comments_got_count = Comment.objects.filter(post__author = user_detail).count() # How much comments current user recieved
-        comments_likes_given_count = CommentLike.objects.filter(user=user_detail).count() # How much comments likes current user gave
-        my_comments_likes_count = CommentLike.objects.filter(comment__user=user_detail).count()  # How much posts likes current user revieved on his comments
-        chats_count = Chat.objects.filter(users=user_detail, is_group=False).count() # How much private chats current user have
-        groups_count = Chat.objects.filter(users=user_detail, is_group=True).count() # How much groups current user have
-        messenger_messages_count = Message.objects.filter(user=user_detail).count() # How much messages current user sented
-        reactions_given_count = Reaction.objects.filter(user=user_detail).count() # How much reactions user sent
-        reactions_got_count = Reaction.objects.filter(message__user=user_detail).count() # How much reactions user revieved
-        stats = {
-            "boards_count": boards_count,
-            "board_messages_count": board_messages_count,
-            "posts_count": posts_count,
-            "tagged_in_posts_count": tagged_in_posts_count,
-            "posts_likes_given_count": posts_likes_given_count,
-            "my_posts_likes_count": my_posts_likes_count,
-            "comments_given_count": comments_given_count,
-            "comments_got_count": comments_got_count,
-            "comments_likes_given_count": comments_likes_given_count,
-            "my_comments_likes_count": my_comments_likes_count,
-            "chats_count": chats_count,
-            "groups_count": groups_count,
-            "messenger_messages_count": messenger_messages_count,
-            "reactions_given_count": reactions_given_count,
-            "reactions_got_count": reactions_got_count,
-        }
-        def cut_number(number):
-            if number > 1000:
-                number = "+999"
-                return number
-            return number
-
-        for key in stats:
-            stats[key] = cut_number(stats[key])
+        stats = profile_stats_for_display(user_detail)
 
         context = {
             "user_detail": user_detail,
@@ -270,6 +241,9 @@ class ToggleFollowView(LoginRequiredMixin, View):
     def post(self, request, slug, *args, **kwargs):
         user_to_follow = get_object_or_404(User, slug=slug)
 
+        if user_to_follow.pk == request.user.pk:
+            return redirect("user_detail", slug=slug)
+
         follow_obj = Follow.objects.filter(
             follower=request.user,
             following=user_to_follow
@@ -281,3 +255,29 @@ class ToggleFollowView(LoginRequiredMixin, View):
             Follow.follow_user(follower=request.user, following=user_to_follow)
 
         return redirect("user_detail", slug=slug)
+
+
+class UsersListView(StaffRequiredMixin, ListView):
+    model = User
+    template_name = 'accounts/users_list.html'
+    context_object_name = 'users'
+    paginate_by = 20
+
+    def get_queryset(self):
+        from django.db.models import Q
+
+        queryset = User.objects.exclude(pk=self.request.user.pk).order_by('username')
+        query = self.request.GET.get('q', '').strip()
+        if query:
+            queryset = queryset.filter(
+                Q(username__icontains=query)
+                | Q(first_name__icontains=query)
+                | Q(last_name__icontains=query)
+                | Q(email__icontains=query)
+            )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('q', '').strip()
+        return context

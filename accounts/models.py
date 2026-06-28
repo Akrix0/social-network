@@ -32,13 +32,14 @@ class UserProfile(AbstractUser):
         super().delete(*args, **kwargs)
 
     def get_friends(self):
-        from accounts.models import Follow
-        following_qs = Follow.objects.filter(follower=self)
-        friends = []
-        for follow in following_qs:
-            if Follow.is_friends(self, follow.following):
-                friends.append(follow.following)
-        return friends
+        following_ids = Follow.objects.filter(follower=self).values_list(
+            "following_id", flat=True
+        )
+        mutual_ids = Follow.objects.filter(
+            follower_id__in=following_ids,
+            following=self,
+        ).values_list("follower_id", flat=True)
+        return UserProfile.objects.filter(id__in=mutual_ids)
 
     class Meta:
         verbose_name = 'User Profile'
@@ -53,24 +54,30 @@ class Follow(BaseModel):
     class Meta:
         verbose_name = 'Follow'
         verbose_name_plural = 'Follows'
-        unique_together = ('follower', 'following')
+        constraints = [
+            models.UniqueConstraint(
+                fields=('follower', 'following'),
+                name='accounts_follow_follower_following_uniq',
+            ),
+        ]
 
     def __str__(self):
         return f"{self.follower} → {self.following}"
     
     @classmethod
-    def is_friends(self, user1, user2):
-        follow_obj_1 = Follow.objects.filter(follower=user1, following=user2)
-        follow_obj_2 = Follow.objects.filter(follower=user2, following=user1)
-        if follow_obj_1.exists() and follow_obj_2.exists():
-            return True
-        return False
-    
+    def is_friends(cls, user1, user2):
+        return (
+            Follow.objects.filter(follower=user1, following=user2).exists()
+            and Follow.objects.filter(follower=user2, following=user1).exists()
+        )
+
     @classmethod
-    def follow_user(self, follower, following):
-        follow_obj, created = Follow.objects.get_or_create(follower=follower, following=following)
+    def follow_user(cls, follower, following):
+        follow_obj, created = Follow.objects.get_or_create(
+            follower=follower, following=following
+        )
         return created
 
     @classmethod
-    def unfollow_user(self, follower, following):
+    def unfollow_user(cls, follower, following):
         Follow.objects.filter(follower=follower, following=following).delete()

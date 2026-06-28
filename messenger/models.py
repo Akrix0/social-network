@@ -15,8 +15,6 @@ class Chat(BaseModel):
         if not self.background:
             self.background = 'default/default_bg.png'
         super().save(*args, **kwargs)
-        if not self.is_group and self.users.count() > 2:
-            raise ValueError("Privately chats cannot have more than 2 users.")
             
     def __str__(self):
         return self.title
@@ -36,6 +34,7 @@ class Message(BaseModel):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages', null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messages', null=False)
     text = models.CharField(max_length=4096, null=True, blank=True, verbose_name = 'Text')
+    reply_on = models.ForeignKey("self", on_delete=models.CASCADE, related_name='replies', null=True, blank=True)   
 
     def __str__(self):
         return f"{self.user}: {self.text[:30] if self.text else '[file]'}"
@@ -53,8 +52,13 @@ class Reaction(BaseModel):
     def __str__(self):
         return f"{self.emoji} --- {self.message}"
     
-    class Meta: 
-        unique_together = ("message", "user")
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("message", "user"),
+                name='messenger_reaction_message_user_uniq',
+            ),
+        ]
         ordering = ["created_at"]
         verbose_name = 'Reaction'
         verbose_name_plural = 'Reactions'
