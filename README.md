@@ -1,159 +1,89 @@
-# SN (Social Network) PulSe
+# Social Network
 
----
+A Django-based social networking platform with real-time messaging, community boards, posts, and notifications.
 
-> A full-featured social network focused on real-time communication, communities, and meaningful interaction. Share moments. Meet people. Build connections.
+## Description
 
-<!-- Status badges -->
-![Tests](https://github.com/Akrix0/social-network/actions/workflows/tests.yml/badge.svg)
-![Last commit](https://img.shields.io/github/last-commit/Akrix0/social-network)
-![Repo size](https://img.shields.io/github/repo-size/Akrix0/social-network)
-![Stars](https://img.shields.io/github/stars/Akrix0/social-network)
-![Forks](https://img.shields.io/github/forks/Akrix0/social-network)
+This is a full-featured social network implemented as a Django application. It supports user accounts, content sharing via posts, community boards, private and group messaging with WebSockets, and real-time notifications.
 
-<!-- Languages -->
-![Top language](https://img.shields.io/github/languages/top/Akrix0/social-network)
-![Languages count](https://img.shields.io/github/languages/count/Akrix0/social-network)
+The project uses Django class-based views, templates with Bootstrap, and ASGI for WebSocket support.
 
-<!-- Repo health -->
-![Open issues](https://img.shields.io/github/issues/Akrix0/social-network)
-![Contributors](https://img.shields.io/github/contributors/Akrix0/social-network)
+## Features
 
-## 📌 Description
+### Posts
+- Create posts with title, text, optional file attachments, and user tags.
+- Like posts and comments.
+- View counters.
+- Edit and delete own content.
+- Infinite scroll for browsing.
 
-SN PulSe is a social network project built as a serious, real-world application and publicly deployed online. It is designed as a place where people can communicate freely, share personal moments, and connect with others who have similar interests.
+### Boards (Communities)
+- Create and join community boards with name, description, slug, and tags.
+- Board owners and admins manage content; members can view and follow discussions.
+- Infinite scroll for messages within boards.
+- Independent tags support.
 
-The platform focuses on **interaction**, not passive scrolling. Users actively post content, participate in communities, chat in real time, and receive live updates about what matters to them.
+### Messenger
+- Real-time private and group chats via WebSockets.
+- Message reactions (single emoji per user).
+- Customizable chat settings including name and background for groups.
 
-The **entire interface is in English**.
+### Notifications
+- Real-time notifications for interactions (likes, comments, mentions, etc.).
+- Track read status.
 
----
+### Accounts and Profiles
+- Two-step registration.
+- User profiles with avatar, bio, phone, date of birth, and username-based slug.
+- Follow and friend relationships.
+- Basic activity statistics.
 
-## 🎯 Project Purpose
+### Main Page
+- Feed with tabs for all posts or friends-only.
+- Search functionality.
+- Sections for popular boards, trending tags, suggested users.
 
-SN PulSe is created for teenagers and general users who:
+## Tech Stack
 
-- want to share meaningful events from their lives;
-- want to find friends based on interests;
-- feel socially isolated and want a safe online space to connect;
-- prefer active communication instead of endless content consumption.
+**Backend**
+- Python
+- Django (class-based views)
+- Django Channels / WebSockets for real-time features
+- Django signals
+- ASGI (uvicorn)
 
-The project aims to reduce social isolation and help people find like-minded individuals online.
+**Frontend**
+- HTML, CSS, JavaScript
+- Bootstrap 5
 
----
+**Database**
+- SQLite (development)
+- PostgreSQL (production)
 
-## 🌟 Core Features
+**Media**
+- Cloudinary (deployment)
 
-### 📝 Posts
+## Project Structure
 
-Posts are the main content units of the platform. Each post includes:
+```
+social-network/
+├── accounts/          # User management
+├── boards/            # Community boards
+├── messenger/         # Real-time chat
+├── notifications/     # Notifications
+├── posts/             # Post functionality
+├── main/              # Main app views and templates
+├── social_network/    # Project settings
+├── templates/         # HTML templates
+├── static/            # Static assets
+├── media/default/     # Default media files
+├── docs/screenshots/  # Example screenshots
+├── manage.py
+├── requirements.txt
+└── .env.example
+```
 
-- a title and text content;
-- attached files (isn't obligatory and displayed cleanly inside the post);
-- view counter;
-- likes and comments;
-- tagged users.
-
-Users can like both posts and comments, edit or delete their own content, and browse discussions comfortably using **infinite scroll**.
-
----
-
-### 🧩 Boards (Communities)
-
-Boards are large-scale community spaces that work like public groups.
-
-Each board has:
-
-- a name, description, and unique slug;
-- a creator (owner);
-- administrators;
-- members;
-- thematic tags.
-
-Only the creator and administrators can publish messages, while members can follow discussions. Messages inside boards are organized by topic and loaded using infinite scroll for better usability.
-
-Tags can exist independently and may or may not be attached to a specific board.
-
----
-
-### 💬 Messenger
-
-SN PulSe includes a fully functional real-time messenger.
-
-Users can:
-
-- create private chats;
-- create group chats;
-- send and receive messages instantly;
-- react to messages using emojis.
-
-Each chat has its own settings, background, name (for groups), and members. Message reactions are limited to one emoji per user per message, chosen from a predefined emoji set.
-
-All messaging works live without page reloads.
-
----
-
-### 🔔 Notifications
-
-Notifications inform users about important events across the platform.
-
-A notification contains:
-
-- who triggered the event;
-- what type of event happened;
-- where it happened (post, comment, board, chat, etc.);
-- when it happened;
-- whether it has been read.
-
-Notifications are delivered in real time and help users stay connected without constantly refreshing pages.
-
----
-
-### 🤝 Social Interactions
-
-Users can:
-
-- follow each other;
-- become friends;
-- mention friends in posts;
-- create group chats with friends.
-
-These interactions unlock additional functionality and help build real social connections on the platform.
-
----
-
-## 👤 Accounts & Profiles
-
-Registration is completed in **two steps**.
-
-Each user profile may includes:
-
-- avatar;
-- description (bio);
-- phone number;
-- date of birth;
-- personal slug generated from the username.
-
-Profiles also display basic statistics and activity, making it easier to understand how active you are.
-
----
-
-## 🏠 Main Page
-
-The main page combines all key elements of the platform:
-
-- #### The main part is displaying posts. Use tabs to see all posts or only the posts of your friends. There is also search them so you can find any post that matches your search query
-- popular boards;
-- trending tags;
-- personal user statistics;
-- suggested people you may know (friends of your friends).
-
-
-It acts as a central hub for discovery and activity.
-
----
-
-## 📷 Screenshots
+##  Screenshots
 
 | Main page | Messenger |
 |-----------|-----------|
@@ -174,126 +104,81 @@ It acts as a central hub for discovery and activity.
 > Screenshots are stored in [`docs/screenshots/`](docs/screenshots/).  
 > Live demo: [social-network-kddy.onrender.com](https://social-network-kddy.onrender.com/)—out of work
 
----
 
-## 🛠️ Technologies Used
+## Installation
 
-### Backend
+1. Clone the repository:
+   ```
+   git clone https://github.com/Akrix0/social-network.git
+   cd social-network
+   ```
 
-- Python with Django framework(CBV);
-- WebSockets for real-time features;
-- Django signals;
-- Select2 widgets for better many-to-many field interaction.
+2. Create and activate virtual environment:
+   ```
+   python -m venv venv
+   # Windows
+   venv\Scripts\activate
+   # macOS/Linux
+   source venv/bin/activate
+   ```
 
-### Frontend
+3. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
 
-- HTML, CSS, JavaScript;
-- Bootstrap 5 for layout and responsiveness;
+4. Set up environment variables:
+   ```
+   cp .env.example .env
+   ```
+   Edit `.env` to set `DJANGO_SECRET_KEY` and other required settings (e.g., Cloudinary if using media).
 
-### Database
+5. Apply migrations:
+   ```
+   python manage.py migrate
+   ```
 
-- SQLite for local development;
-- PostgreSQL in production.
+6. (Optional) Create superuser:
+   ```
+   python manage.py createsuperuser
+   ```
 
-### Media
+7. Collect static files:
+   ```
+   python manage.py collectstatic --noinput
+   ```
 
-- Cloudinary is used for media storage in deployment.
+8. Run the server:
+   ```
+   # Recommended: HTTP + WebSockets
+   uvicorn social_network.asgi:application --reload
 
----
+   # Alternative: Django dev server (HTTP only)
+   python manage.py runserver
+   ```
 
-## ⚙️ Local Setup
+## Usage
 
-To run the project locally:
+After starting the server, access the application at `http://127.0.0.1:8000/`.
 
-1. Clone the repository
+Register an account and explore the feed, create posts, join boards, or start chats.
 
-```bash
-git clone https://github.com/Akrix0/social-network
-cd social-network
-```
+## Development
 
-2. Create and activate a virtual environment
+- Run tests: `python manage.py test`
+- The project uses Django's standard structure with separate apps for major features.
+- Real-time functionality relies on Django Channels/WebSockets.
 
-```bash
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# macOS / Linux
-source venv/bin/activate
-```
+## Future Improvements
 
-3. Install dependencies
+- TODO: Improve performance and optimize queries.
+- TODO: Add file attachments to board messages.
+- TODO: Extend real-time features where needed.
 
-```bash
-pip install -r requirements.txt
-```
+## License
 
-4. Configure environment variables
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-```bash
-cp .env.example .env
-# Edit .env and set DJANGO_SECRET_KEY
-```
+## Credits
 
-5. Apply migrations
-
-```bash
-python manage.py migrate
-```
-
-6. (Optional) Create a superuser
-
-```bash
-python manage.py createsuperuser
-```
-
-7. Collect static files
-
-```bash
-python manage.py collectstatic --noinput
-```
-
-8. Run the development server
-
-```bash
-# HTTP + WebSockets (recommended)
-uvicorn social_network.asgi:application --reload
-
-# Or Django runserver (HTTP only)
-python manage.py runserver
-```
-
-9. Run tests
-
-```bash
-python manage.py test
-```
-
----
-
-## 🛣️ Future Plans
-
-- improve performance and code optimization;
-- add file support for boards;
-- extend real-time functionality;
-- continue polishing the overall user experience.
-
-If you have ideas or suggestions, they are always welcome.
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
-
-You are free to use, modify, and distribute this software, provided that the
-original copyright notice is included.
----
-
-## 🙌 Credits
-
-This project was fully designed and developed by **Akrix0** as a personal portfolio and learning project.
-
-- Concept, backend, frontend, and UI logic: [**Akrix0**](https://github.com/Akrix0)
-- Frameworks and libraries are credited to their respective authors
-
+Developed by [Akrix0](https://github.com/Akrix0).
